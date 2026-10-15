@@ -8,6 +8,7 @@ Python implementation of European call and put pricing, validated against analyt
 - Verifies correctness with a **put-call parity** check
 - Prices the call by **Monte Carlo simulation** under risk-neutral dynamics
 - Quantifies simulation error with a **95% confidence band** and shows convergence to the analytical price
+- Reduces simulation variance with **antithetic variates** and quantifies the gain
 
 ## Method
 
@@ -25,21 +26,29 @@ $$S_T = S \exp\left(\left(r - \tfrac{\sigma^2}{2}\right)T + \sigma\sqrt{T}\,Z\ri
 
 The call price is the discounted average payoff $e^{-rT}\,\mathbb{E}[\max(S_T - K, 0)]$, and the standard error is $s/\sqrt{n}$.
 
+**Antithetic variates**
+
+For each draw $Z$, the mirrored path with $-Z$ is also simulated. Because the call payoff is monotonic in $Z$, the two payoffs are negatively correlated, so averaging each pair reduces variance. With the same number of payoff evaluations, the variance is scaled by $(1+\rho)$, where $\rho$ is the correlation between the payoffs of $Z$ and $-Z$. The standard error is computed on the pair averages, since the two paths in a pair are not independent.
+
 ## Results
 
 Test case: $S=100,\ K=100,\ T=1,\ r=0.05,\ \sigma=0.2$
 
-| Method | Call price |
-|---|---|
-| Black-Scholes | 10.4506 |
-| Monte Carlo (100,000 paths) | 10.4205 (SE 0.047) |
+| Method | Call price | Standard error |
+|---|---|---|
+| Black-Scholes | 10.4506 | n/a |
+| Monte Carlo (100,000 paths) | 10.4205 | 0.0468 |
+| Antithetic MC (100,000 paths) | 10.4673 | 0.0331 |
 
 - Black-Scholes put: 5.5735
 - Put-call parity $C - P = S - Ke^{-rT}$ holds to numerical precision
+- At the same computational cost, antithetic variates reduce the standard error by about 29% (0.0468 to 0.0331), which corresponds to an estimated payoff correlation of about -0.5.
 
 ![Convergence plot](convergence_plot.png)
 
 The Monte Carlo estimate converges to the analytical price. The error shrinks proportionally to $1/\sqrt{n}$: 100x more simulations give a 10x smaller standard error. A fixed random seed is used for reproducibility.
+
+![Variance reduction](variance_reduction_plot.png)
 
 ## How to run
 
@@ -55,5 +64,4 @@ jupyter notebook option_pricing.ipynb
 ## Possible extensions
 
 - Pricing with real market data (historical volatility from yfinance)
-- Variance reduction (antithetic variates)
 - Path-dependent options (Asian, barrier)
