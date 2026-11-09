@@ -50,6 +50,30 @@ The Monte Carlo estimate converges to the analytical price. The error shrinks pr
 
 ![Variance reduction](variance_reduction_plot.png)
 
+## Real market data example
+
+Black-Scholes and Monte Carlo applied to a listed AAPL call option (data via yfinance, 9 Nov 2026).
+
+| Input | Value |
+|---|---|
+| Strike | 340 |
+| Expiry | 2027-02-19 (T = 0.277 years) |
+| Risk-free rate | 4.00% (assumption) |
+| Option price (bid/ask mid) | 24.20 |
+
+| Volatility | Value |
+|---|---|
+| Historical (1y, annualized) | 24.94% |
+| Implied (from market price) | 29.52% |
+
+Implied volatility is found by root-finding (`scipy.optimize.brentq`): the volatility for which the Black-Scholes price equals the observed market price. It lies above realized volatility, i.e. the market prices in more uncertainty than the past year showed. This can reflect upcoming events such as earnings or a volatility risk premium.
+
+## Limitations
+
+- Black-Scholes assumes constant volatility, no dividends and European exercise. AAPL options are American style and AAPL pays a small dividend.
+- The risk-free rate is an assumption, not an interpolated market curve.
+- Quotes from yfinance can be delayed or stale, and wide bid/ask spreads make the mid price (and the implied volatility) uncertain.
+
 ## How to run
 
 ```bash
@@ -63,5 +87,4 @@ jupyter notebook option_pricing.ipynb
 
 ## Possible extensions
 
-- Pricing with real market data (historical volatility from yfinance)
 - Path-dependent options (Asian, barrier)
