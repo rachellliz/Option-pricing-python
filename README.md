@@ -62,16 +62,16 @@ Black-Scholes applied to listed AAPL call options (data via yfinance, 9 Nov 2026
 
 | Input | Value |
 |---|---|
-| Spot | [S_now] |
+| Spot | print(S_now) |
 | Strike | 340 |
 | Expiry | 2027-02-19 (T = 0.277 years) |
 | Risk-free rate | 4.00% (assumption) |
-| Option price (bid/ask mid) | [mid] |
+| Option price (bid/ask mid) | 27.50 |
 
 | Volatility | Value |
 |---|---|
-| Historical (1y, annualized) | [24.94%] |
-| Implied (from market price) | [IV] |
+| Historical (1y, annualized) | 24.94% |
+| Implied (from market price) | 28.81% |
 
 ### Implied volatility across strikes
 
